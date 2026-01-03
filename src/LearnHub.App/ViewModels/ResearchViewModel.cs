@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,6 +46,12 @@ public partial class ResearchViewModel : ObservableObject
     [ObservableProperty]
     private VideoItem? _selectedVideo;
 
+    [ObservableProperty]
+    private string _searchErrorMessage = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasSearchError = false;
+
     public ResearchViewModel(
         SourceDiscoveryService sourceService,
         VideoDiscoveryService videoService,
@@ -61,6 +68,11 @@ public partial class ResearchViewModel : ObservableObject
         if (string.IsNullOrWhiteSpace(Query)) return;
 
         IsSearching = true;
+        HasSearchError = false;
+        SearchErrorMessage = string.Empty;
+        SearchResults.Clear();
+        VideoResults.Clear();
+
         try
         {
             var sourceTask = _sourceService.SearchAsync(Query, PreferReputableDomains);
@@ -70,6 +82,17 @@ public partial class ResearchViewModel : ObservableObject
 
             SearchResults = sourceTask.Result.ToList();
             VideoResults = videoTask.Result.ToList();
+
+            if (SearchResults.Count == 0 && VideoResults.Count == 0)
+            {
+                HasSearchError = true;
+                SearchErrorMessage = "No results found. Try a different search query or check your internet connection.";
+            }
+        }
+        catch (Exception ex)
+        {
+            HasSearchError = true;
+            SearchErrorMessage = $"Error searching: {ex.Message}";
         }
         finally
         {

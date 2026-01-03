@@ -97,3 +97,18 @@ public class StatusColorConverter : IValueConverter
     }
 }
 
+public class SearchButtonTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool isSearching)
+            return isSearching ? "Searching..." : "Search Web";
+        return "Search Web";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+

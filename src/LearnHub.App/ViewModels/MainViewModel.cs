@@ -30,7 +30,8 @@ public partial class MainViewModel : ObservableObject
         });
 
         // Initialize services
-        _sourceService = new SourceDiscoveryService(new DefaultWebSearchProvider());
+        var logger = _loggerFactory.CreateLogger<LearnHub.Infrastructure.Providers.DuckDuckGoWebSearchProvider>();
+        _sourceService = new SourceDiscoveryService(new LearnHub.Infrastructure.Providers.DuckDuckGoWebSearchProvider(null, logger));
         _videoService = new VideoDiscoveryService(new DefaultVideoProvider());
         _planService = new PlanGeneratorService(new LocalAiClient());
         _ytDlpService = new YtDlpService(_loggerFactory.CreateLogger<YtDlpService>());

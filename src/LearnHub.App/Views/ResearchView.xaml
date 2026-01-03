@@ -10,6 +10,8 @@
         <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <converters:CredibilityColorConverter x:Key="CredibilityColorConverter"/>
         <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:SearchButtonTextConverter x:Key="SearchButtonTextConverter"/>
         <Style x:Key="CardStyle" TargetType="Border">
             <Setter Property="Background" Value="#FFFFFF"/>
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
@@ -73,8 +75,9 @@
         </Style>
     </UserControl.Resources>
     
-    <Grid Background="#F5F5F5">
+        <Grid Background="#F5F5F5">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -98,7 +101,7 @@
                         </TextBox.InputBindings>
                     </TextBox>
                     <Button Grid.Column="1" 
-                            Content="Search Web" 
+                            Content="{Binding IsSearching, Converter={StaticResource SearchButtonTextConverter}}" 
                             Command="{Binding SearchCommand}"
                             Style="{StaticResource ModernButtonStyle}"
                             IsEnabled="{Binding IsSearching, Converter={StaticResource InverseBooleanConverter}}"
@@ -113,8 +116,23 @@
             </StackPanel>
         </Border>
 
+        <!-- Error Message -->
+        <Border Grid.Row="1" 
+                Background="#FFE6E6" 
+                BorderBrush="#FF9999" 
+                BorderThickness="1" 
+                CornerRadius="6" 
+                Padding="16" 
+                Margin="16,16,16,0"
+                Visibility="{Binding HasSearchError, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <TextBlock Text="{Binding SearchErrorMessage}" 
+                       Foreground="#CC0000" 
+                       TextWrapping="Wrap"
+                       FontSize="13"/>
+        </Border>
+
         <!-- Main Content Area -->
-        <Grid Grid.Row="1" Margin="16">
+        <Grid Grid.Row="2" Margin="16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
