@@ -1,0 +1,360 @@
+<UserControl x:Class="LearnHub.App.Views.ResearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:LearnHub.App.Converters"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:CredibilityColorConverter x:Key="CredibilityColorConverter"/>
+        <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#40000000" Direction="270" ShadowDepth="2" BlurRadius="8" Opacity="0.1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#1A1A1A"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#0078D4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0063B1"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#CCCCCC"/>
+                    <Setter Property="Foreground" Value="#666666"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#D0D0D0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#FAFAFA"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#0078D4"/>
+                    <Setter Property="Background" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Search Section -->
+        <Border Grid.Row="0" Style="{StaticResource CardStyle}" Margin="16,16,16,0">
+            <StackPanel>
+                <TextBlock Text="Research &amp; Parse Web Content" Style="{StaticResource SectionTitleStyle}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" 
+                             Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" 
+                             Style="{StaticResource ModernTextBoxStyle}"
+                             Margin="0,0,12,0">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchCommand}"/>
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="1" 
+                            Content="Search Web" 
+                            Command="{Binding SearchCommand}"
+                            Style="{StaticResource ModernButtonStyle}"
+                            IsEnabled="{Binding IsSearching, Converter={StaticResource InverseBooleanConverter}}"
+                            Margin="0,0,12,0"
+                            MinWidth="120"/>
+                    <CheckBox Grid.Column="2" 
+                              Content="Prefer reputable sources" 
+                              IsChecked="{Binding PreferReputableDomains}"
+                              VerticalAlignment="Center"
+                              Foreground="#333333"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Column: Search Results -->
+            <ScrollViewer Grid.Column="0" Margin="0,0,8,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Web Sources" Style="{StaticResource SectionTitleStyle}"/>
+                    
+                    <ItemsControl ItemsSource="{Binding SearchResults}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CardStyle}" 
+                                        Cursor="Hand"
+                                        MouseLeftButtonDown="SourceCard_MouseLeftButtonDown">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" 
+                                                   FontWeight="SemiBold" 
+                                                   FontSize="15"
+                                                   Foreground="#0078D4"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,0,0,6"/>
+                                        <TextBlock Text="{Binding Domain}" 
+                                                   FontSize="12"
+                                                   Foreground="#666666"
+                                                   Margin="0,0,0,8"/>
+                                        <TextBlock Text="{Binding Snippet}" 
+                                                   FontSize="13"
+                                                   Foreground="#333333"
+                                                   TextWrapping="Wrap"
+                                                   LineHeight="20"/>
+                                        <TextBlock Margin="0,8,0,0">
+                                            <Run Text="Credibility: " Foreground="#666666"/>
+                                            <Run Text="{Binding CredibilityScore, StringFormat='{}{0:P0}'}" 
+                                                 Foreground="{Binding CredibilityScore, Converter={StaticResource CredibilityColorConverter}}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <TextBlock Text="Videos" Style="{StaticResource SectionTitleStyle}" Margin="0,24,0,0"/>
+                    
+                    <ItemsControl ItemsSource="{Binding VideoResults}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource CardStyle}" 
+                                        Cursor="Hand"
+                                        MouseLeftButtonDown="VideoCard_MouseLeftButtonDown">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Title}" 
+                                                       FontWeight="SemiBold" 
+                                                       FontSize="15"
+                                                       Foreground="#0078D4"
+                                                       TextWrapping="Wrap"
+                                                       Margin="0,0,0,6"/>
+                                            <TextBlock Text="{Binding Channel}" 
+                                                       FontSize="12"
+                                                       Foreground="#666666"
+                                                       Margin="0,0,0,4"/>
+                                            <TextBlock FontSize="12" Foreground="#666666">
+                                                <Run Text="Duration: "/>
+                                                <Run Text="{Binding Duration, Converter={StaticResource TimeSpanToStringConverter}}"/>
+                                                <Run Text=" • Published: "/>
+                                                <Run Text="{Binding PublishedDate, StringFormat='{}{0:MMM dd, yyyy}'}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Right Column: Plan Generation -->
+            <ScrollViewer Grid.Column="1" Margin="8,0,0,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Border Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Generate Learning Plan" Style="{StaticResource SectionTitleStyle}"/>
+                            <TextBox Text="{Binding PlanPrompt, UpdateSourceTrigger=PropertyChanged}" 
+                                     Style="{StaticResource ModernTextBoxStyle}"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     MinHeight="80"
+                                     Margin="0,0,0,12"
+                                     VerticalScrollBarVisibility="Auto">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter" Modifiers="Ctrl" Command="{Binding GeneratePlanCommand}"/>
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <Button Content="Generate Plan" 
+                                    Command="{Binding GeneratePlanCommand}"
+                                    Style="{StaticResource ModernButtonStyle}"
+                                    IsEnabled="{Binding IsGeneratingPlan, Converter={StaticResource InverseBooleanConverter}}"
+                                    HorizontalAlignment="Right"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0" Visibility="{Binding Plan, Converter={StaticResource NullToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Plan.PlanTitle}" 
+                                       FontSize="20" 
+                                       FontWeight="Bold"
+                                       Foreground="#1A1A1A"
+                                       Margin="0,0,0,16"/>
+                            
+                            <TextBlock Text="Prerequisites" 
+                                       FontWeight="SemiBold" 
+                                       FontSize="16"
+                                       Foreground="#333333"
+                                       Margin="0,0,0,8"/>
+                            <ItemsControl ItemsSource="{Binding Plan.Prerequisites}" Margin="0,0,0,16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" 
+                                                   FontSize="13"
+                                                   Foreground="#555555"
+                                                   Margin="16,4,0,4">
+                                            <TextBlock.TextDecorations>
+                                                <TextDecoration Location="Prefix">
+                                                    <TextDecoration.Pen>
+                                                        <Pen Brush="#0078D4" Thickness="2"/>
+                                                    </TextDecoration.Pen>
+                                                </TextDecoration>
+                                            </TextBlock.TextDecorations>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl ItemsSource="{Binding Plan.WeeklySchedule}" Margin="0,0,0,16">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#E0E0E0" 
+                                                BorderThickness="0,0,0,1" 
+                                                Padding="0,0,0,16"
+                                                Margin="0,0,0,16">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding WeekLabel}" 
+                                                           FontWeight="SemiBold" 
+                                                           FontSize="16"
+                                                           Foreground="#0078D4"
+                                                           Margin="0,0,0,12"/>
+                                                <ItemsControl ItemsSource="{Binding Days}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Background="#F9F9F9" 
+                                                                    CornerRadius="6" 
+                                                                    Padding="12" 
+                                                                    Margin="0,0,0,8">
+                                                                <StackPanel>
+                                                                    <TextBlock Text="{Binding DayLabel}" 
+                                                                               FontWeight="SemiBold" 
+                                                                               FontSize="14"
+                                                                               Foreground="#333333"
+                                                                               Margin="0,0,0,8"/>
+                                                                    <TextBlock Text="Reading:" 
+                                                                               FontWeight="SemiBold" 
+                                                                               FontSize="12"
+                                                                               Foreground="#666666"
+                                                                               Margin="0,0,0,4"/>
+                                                                    <ItemsControl ItemsSource="{Binding Reading}" Margin="16,0,0,8">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <TextBlock Text="{Binding}" 
+                                                                                           FontSize="12"
+                                                                                           Foreground="#555555"
+                                                                                           Margin="0,2,0,2"/>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                    <TextBlock Text="Watching:" 
+                                                                               FontWeight="SemiBold" 
+                                                                               FontSize="12"
+                                                                               Foreground="#666666"
+                                                                               Margin="0,0,0,4"/>
+                                                                    <ItemsControl ItemsSource="{Binding Watching}" Margin="16,0,0,8">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <TextBlock Text="{Binding}" 
+                                                                                           FontSize="12"
+                                                                                           Foreground="#555555"
+                                                                                           Margin="0,2,0,2"/>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                    <TextBlock Text="Practice:" 
+                                                                               FontWeight="SemiBold" 
+                                                                               FontSize="12"
+                                                                               Foreground="#666666"
+                                                                               Margin="0,0,0,4"/>
+                                                                    <ItemsControl ItemsSource="{Binding PracticeTasks}" Margin="16,0,0,8">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <TextBlock Text="{Binding}" 
+                                                                                           FontSize="12"
+                                                                                           Foreground="#555555"
+                                                                                           Margin="0,2,0,2"/>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                    <TextBlock Text="Checkpoints:" 
+                                                                               FontWeight="SemiBold" 
+                                                                               FontSize="12"
+                                                                               Foreground="#666666"
+                                                                               Margin="0,0,0,4"/>
+                                                                    <ItemsControl ItemsSource="{Binding Checkpoints}" Margin="16,0,0,0">
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate>
+                                                                                <TextBlock Text="{Binding}" 
+                                                                                           FontSize="12"
+                                                                                           Foreground="#555555"
+                                                                                           Margin="0,2,0,2"/>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>
+

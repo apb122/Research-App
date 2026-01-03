@@ -2,27 +2,77 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LearnHub.App.ViewModels"
-        Title="LearnHub" Height="720" Width="1180">
+        Title="LearnHub - Research and Learning Hub" 
+        Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2A2A3A"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="240" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Background="#1E1E2F" Grid.Column="0" Margin="12">
-            <TextBlock Text="LearnHub" Foreground="White" FontSize="24" FontWeight="Bold" Margin="4" />
-            <ListBox ItemsSource="{Binding NavigationItems}" SelectedItem="{Binding SelectedNavigation}" Margin="0,12,0,0">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" Padding="8" Foreground="Black" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
+        <!-- Modern Sidebar -->
+        <Border Grid.Column="0" 
+                Background="#1E1E2F" 
+                BorderBrush="#2A2A3A" 
+                BorderThickness="0,0,1,0">
+            <StackPanel>
+                <StackPanel Margin="20,24,20,32">
+                    <TextBlock Text="LearnHub" 
+                               Foreground="White" 
+                               FontSize="28" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,4"/>
+                    <TextBlock Text="Research and Learning" 
+                               Foreground="#A0A0A0" 
+                               FontSize="12"/>
+                </StackPanel>
+                
+                <StackPanel Margin="8,0,8,0">
+                    <Button Content="🔍 Research" 
+                            Command="{Binding NavigateToResearchCommand}"
+                            Style="{StaticResource NavButtonStyle}"
+                            Margin="0,0,0,4"/>
+                    <Button Content="⚙️ Settings" 
+                            Command="{Binding NavigateToSettingsCommand}"
+                            Style="{StaticResource NavButtonStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
-        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" />
+        <!-- Main Content Area -->
+        <ContentControl Grid.Column="1" 
+                        Content="{Binding CurrentView}" 
+                        Margin="0"/>
     </Grid>
 </Window>

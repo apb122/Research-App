@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LearnHub.App.Views;
@@ -15,10 +13,10 @@ namespace LearnHub.App.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly ILoggerFactory _loggerFactory;
-    public IReadOnlyList<string> NavigationItems { get; } = new[] { "Search", "Videos", "Plan", "Library", "Settings" };
-
-    [ObservableProperty]
-    private string _selectedNavigation;
+    private readonly SourceDiscoveryService _sourceService;
+    private readonly VideoDiscoveryService _videoService;
+    private readonly PlanGeneratorService _planService;
+    private readonly YtDlpService _ytDlpService;
 
     [ObservableProperty]
     private object? _currentView;
@@ -31,25 +29,32 @@ public partial class MainViewModel : ObservableObject
             builder.AddProvider(new LearnHub.Infrastructure.Logging.FileLoggerProvider(logPath));
         });
 
-        _selectedNavigation = NavigationItems.First();
-        Navigate(_selectedNavigation);
+        // Initialize services
+        _sourceService = new SourceDiscoveryService(new DefaultWebSearchProvider());
+        _videoService = new VideoDiscoveryService(new DefaultVideoProvider());
+        _planService = new PlanGeneratorService(new LocalAiClient());
+        _ytDlpService = new YtDlpService(_loggerFactory.CreateLogger<YtDlpService>());
+
+        // Start with Research view
+        NavigateToResearch();
     }
 
-    partial void OnSelectedNavigationChanged(string value)
+    [RelayCommand]
+    private void NavigateToResearch()
     {
-        Navigate(value);
+        CurrentView = new ResearchView 
+        { 
+            DataContext = new ResearchViewModel(_sourceService, _videoService, _planService) 
+        };
+        OnPropertyChanged(nameof(CurrentView));
     }
 
-    private void Navigate(string destination)
+    [RelayCommand]
+    private void NavigateToSettings()
     {
-        CurrentView = destination switch
-        {
-            "Search" => new SearchView { DataContext = new SearchViewModel(new SourceDiscoveryService(new DefaultWebSearchProvider())) },
-            "Videos" => new VideosView { DataContext = new VideosViewModel(new VideoDiscoveryService(new DefaultVideoProvider())) },
-            "Plan" => new PlanView { DataContext = new PlanViewModel(new PlanGeneratorService(new LocalAiClient())) },
-            "Library" => new LibraryView { DataContext = new LibraryViewModel() },
-            "Settings" => new SettingsView { DataContext = new SettingsViewModel(new YtDlpService(_loggerFactory.CreateLogger<YtDlpService>())) },
-            _ => null
+        CurrentView = new SettingsView 
+        { 
+            DataContext = new SettingsViewModel(_ytDlpService) 
         };
         OnPropertyChanged(nameof(CurrentView));
     }
