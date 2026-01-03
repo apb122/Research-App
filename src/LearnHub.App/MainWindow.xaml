@@ -1,0 +1,28 @@
+<Window x:Class="LearnHub.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:LearnHub.App.ViewModels"
+        Title="LearnHub" Height="720" Width="1180">
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Background="#1E1E2F" Grid.Column="0" Padding="12">
+            <TextBlock Text="LearnHub" Foreground="White" FontSize="24" FontWeight="Bold" Margin="4" />
+            <ListBox ItemsSource="{Binding NavigationItems}" SelectedItem="{Binding SelectedNavigation}" Margin="0,12,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Padding="8" Foreground="Black" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}" />
+    </Grid>
+</Window>

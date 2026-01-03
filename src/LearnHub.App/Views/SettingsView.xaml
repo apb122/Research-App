@@ -1,0 +1,12 @@
+<UserControl x:Class="LearnHub.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Margin="16">
+        <TextBlock Text="Settings" FontSize="20" FontWeight="SemiBold" />
+        <TextBlock Text="yt-dlp path" Margin="0,8,0,0" />
+        <TextBox Text="{Binding YtDlpPath, UpdateSourceTrigger=PropertyChanged}" Width="400" />
+        <Button Content="Detect" Command="{Binding DetectCommand}" Width="120" Margin="0,8,0,0" />
+        <TextBlock Text="{Binding DetectionMessage}" Margin="0,8,0,0" />
+        <TextBlock Text="Downloads are only allowed when the user has rights or permissions." TextWrapping="Wrap" Margin="0,12,0,0" />
+    </StackPanel>
+</UserControl>
