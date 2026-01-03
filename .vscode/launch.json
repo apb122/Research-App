@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (WPF)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/LearnHub.App/bin/Debug/net8.0-windows/LearnHub.App.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/LearnHub.App",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "enableStepFiltering": true,
+            "logging": {
+                "moduleLoad": false
+            }
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
