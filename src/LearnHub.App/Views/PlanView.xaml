@@ -9,7 +9,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Spacing="8">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style TargetType="TextBox">
+                    <Setter Property="Margin" Value="0,0,8,0" />
+                </Style>
+                <Style TargetType="Button">
+                    <Setter Property="Margin" Value="0,0,0,0" />
+                </Style>
+            </StackPanel.Resources>
             <TextBox Width="400" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" />
             <Button Content="Generate" Command="{Binding GenerateCommand}" />
         </StackPanel>

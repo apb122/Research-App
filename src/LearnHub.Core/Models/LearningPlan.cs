@@ -18,7 +18,6 @@ public record LearningPlan
 
     [JsonPropertyName("spacedRepetitionReminders")]
     public IReadOnlyList<string>? SpacedRepetitionReminders { get; init; }
-    ;
 }
 
 public record WeeklySchedule

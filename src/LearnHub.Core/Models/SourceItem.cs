@@ -8,7 +8,5 @@ public record SourceItem
     public string Url { get; init; } = string.Empty;
     public string Domain { get; init; } = string.Empty;
     public DateTimeOffset? PublishedDate { get; init; }
-    ;
     public double CredibilityScore { get; init; }
-    ;
 }

@@ -8,8 +8,6 @@ public record VideoItem
     public string Description { get; init; } = string.Empty;
     public string Url { get; init; } = string.Empty;
     public TimeSpan Duration { get; init; }
-    ;
     public DateTimeOffset? PublishedDate { get; init; }
-    ;
     public IReadOnlyDictionary<string, string> Thumbnails { get; init; } = new Dictionary<string, string>();
 }

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LearnHub.App.Views;
@@ -38,7 +42,7 @@ public partial class MainViewModel : ObservableObject
 
     private void Navigate(string destination)
     {
-        _currentView = destination switch
+        CurrentView = destination switch
         {
             "Search" => new SearchView { DataContext = new SearchViewModel(new SourceDiscoveryService(new DefaultWebSearchProvider())) },
             "Videos" => new VideosView { DataContext = new VideosViewModel(new VideoDiscoveryService(new DefaultVideoProvider())) },
